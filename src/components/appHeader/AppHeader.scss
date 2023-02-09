@@ -1,0 +1,20 @@
+.app {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    -webkit-box-shadow: 0 4px 6px -6px #222;
+    -moz-box-shadow: 0 4px 6px -6px #222;
+    box-shadow: 0 4px 6px -6px #222;
+  }
+  &__nav-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  &__nav-links {
+    margin: 0 24px;
+  }
+}
