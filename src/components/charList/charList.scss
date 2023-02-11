@@ -20,12 +20,12 @@
     }
     &_active:focus {
       transform: scale(1.05);
-      box-shadow: 0 0 15px 7px rgba(34, 60, 80, 0.2);
+      box-shadow: 0 0 15px 7px #00ced1;
       transition: box-shadow 0.5s, transform 0.5s;
     }
     &:hover::after {
       transform: translate(-50%, 40px) scale(0.75);
-      transition: transform 1s;
+      transition: transform 0.5s;
     }
     img {
       width: 240px;

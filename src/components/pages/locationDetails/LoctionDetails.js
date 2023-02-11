@@ -1,6 +1,6 @@
-import "../../style/details.scss";
-import arrow from "../../resourses/icons/arrow.svg";
-import rickphoto from "../../resourses/img/rickphoto.png";
+import "../../../style/details.scss";
+import arrow from "../../../resourses/icons/arrow.svg";
+import rickphoto from "../../../resourses/img/rickphoto.png";
 
 const LoctionDetails = () => {
   return (

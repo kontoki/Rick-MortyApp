@@ -1,7 +1,47 @@
+import { useEffect } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import rickmorty3 from "../../resourses/img/rickmorty3.png";
+import useService from "../../services/Service";
 import "./episodesList.scss";
 
 const EpisodesList = () => {
+  const [episodes, setEpisodes] = useState([]);
+  const [offset, setOffset] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+
+  const { getAllEpisodes } = useService();
+
+  useEffect(() => {
+    updateEpisodes();
+  }, []);
+
+  const updateEpisodes = (offset) => {
+    setOffset((offset) =>
+      offset.map((item) => {
+        return item + 12;
+      })
+    );
+    getAllEpisodes(offset).then(onEpisodeLoaded);
+  };
+
+  const onEpisodeLoaded = (newEpisodes) => {
+    setEpisodes([...episodes, ...newEpisodes]);
+  };
+
+  const episodesList = () => {
+    return episodes.map((item) => {
+      return (
+        <Link to={`/episodes/${item.id}`} key={item.id}>
+          <li className="list-grid__item">
+            {item.name}
+            <span>{item.air_date}</span>
+            <span className="episode-list__span">{item.episode}</span>
+          </li>
+        </Link>
+      );
+    });
+  };
+
   return (
     <div className="episode-list">
       <div className="app__image">
@@ -14,93 +54,15 @@ const EpisodesList = () => {
           placeholder="Filter by name..."
         />
       </div>
-      <ul className="list-grid">
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-        <a href="#">
-          <li className="list-grid__item">
-            Pilot
-            <span>December 2, 2013</span>
-            <span className="episode-list__span">SE01E01</span>
-          </li>
-        </a>
-      </ul>
-      <button>LOAD MORE</button>
+      <ul className="list-grid">{episodesList()}</ul>
+      <button
+        style={{ display: episodes.length === 39 ? "none" : "block" }}
+        onClick={() => {
+          updateEpisodes(offset);
+        }}
+      >
+        LOAD MORE
+      </button>
     </div>
   );
 };

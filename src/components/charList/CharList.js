@@ -4,6 +4,7 @@ import useService from "../../services/Service";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const CharList = () => {
   const [chars, setChars] = useState([]);
@@ -17,19 +18,27 @@ const CharList = () => {
     updateChars(offset);
   }, []);
 
-  const updateChars = (offset, status, gender) => {
+  const updateChars = (offset, status, gender, species, name) => {
     setOffset((offset) =>
       offset.map((item) => {
         return item + 8;
       })
     );
     onLoading();
-    if (status !== undefined) {
-      getAllCharacters(offset, status).then(onStatusLoaded).catch(onError);
-    } else if (gender !== undefined) {
-      getAllCharacters(offset, status).then(onStatusLoaded).catch(onError);
+
+    if (
+      gender !== undefined ||
+      status !== undefined ||
+      species !== undefined ||
+      name !== undefined
+    ) {
+      getAllCharacters(offset, status, gender, species, name)
+        .then(onStatusLoaded)
+        .catch(onError);
     } else {
-      getAllCharacters(offset, status).then(onCharsLoaded).catch(onError);
+      getAllCharacters(offset, status, gender, species, name)
+        .then(onCharsLoaded)
+        .catch(onError);
     }
   };
 
@@ -42,7 +51,7 @@ const CharList = () => {
   };
 
   const onLoading = () => {
-    setLoading(false);
+    setLoading((loading) => false);
   };
 
   const onError = () => {
@@ -50,17 +59,15 @@ const CharList = () => {
   };
 
   const renderList = () => {
-    return chars.map((item) => {
+    return chars.map((item, id) => {
       return (
-        <li
-          className="char__sample char__sample_active"
-          key={item.id}
-          tabIndex={0}
-        >
-          <img src={item.image} alt="image" />
-          <div className="char__name">{item.name}</div>
-          <div className="char__description">{item.species}</div>
-        </li>
+        <Link to={`/character/${item.id}`} key={item.id}>
+          <li className="char__sample char__sample_active" tabIndex={0}>
+            <img src={item.image} alt={item.name} />
+            <div className="char__name">{item.name}</div>
+            <div className="char__description">{item.species}</div>
+          </li>
+        </Link>
       );
     });
   };
@@ -79,21 +86,51 @@ const CharList = () => {
           type="text"
           className="search__input"
           placeholder="Filter by name..."
+          onChange={(e) => {
+            updateChars(
+              offset,
+              undefined,
+              undefined,
+              undefined,
+              e.target.value.trim().toLowerCase()
+            );
+          }}
         />
-        <select name="Species" id="Species" className="search__select">
+        <select
+          name="Species"
+          id="Species"
+          className="search__select"
+          onChange={(e) => {
+            updateChars(
+              offset,
+              undefined,
+              undefined,
+              e.target.value,
+              undefined
+            );
+          }}
+        >
           <option value="" hidden>
             Species
           </option>
-          <option value="">Alien Parasite Characters </option>
-          <option value="">Aliens</option>
-          <option value="">Clones</option>
-          <option value="">Cyborgs</option>
-          <option value="">Mythologs</option>
-          <option value="">Human</option>
-          <option value="">Robots</option>
-          <option value="">Vampires</option>
+          <option value="alien">Aliens</option>
+          <option value="human">Human</option>
+          <option value="animal">Animal</option>
+          <option value="cronenberg">Cronenberg</option>
+          <option value="disease">Disease</option>
+
+          <option value="humanoid">Humanoid</option>
+          <option value="unknown">Unknown</option>
+          <option value="Poopybutthole">Poopybutthole</option>
         </select>
-        <select name="Gender" id="Gender" className="search__select">
+        <select
+          name="Gender"
+          id="Gender"
+          className="search__select"
+          onChange={(e) =>
+            updateChars(offset, undefined, e.target.value, undefined, undefined)
+          }
+        >
           <option value="" hidden>
             Gender
           </option>
@@ -107,7 +144,13 @@ const CharList = () => {
           id="Status"
           className="search__select"
           onChange={(e) => {
-            updateChars(offset, e.target.value);
+            updateChars(
+              offset,
+              e.target.value,
+              undefined,
+              undefined,
+              undefined
+            );
           }}
         >
           <option value="" hidden>
