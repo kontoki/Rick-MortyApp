@@ -92,7 +92,9 @@ const CharList = () => {
               undefined,
               undefined,
               undefined,
-              e.target.value.trim().toLowerCase()
+              e.target.value.trim().toLowerCase() === ""
+                ? undefined
+                : e.target.value.trim().toLowerCase()
             );
           }}
         />

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import rickmorty3 from "../../resourses/img/rickmorty3.png";
@@ -15,17 +15,25 @@ const EpisodesList = () => {
     updateEpisodes();
   }, []);
 
-  const updateEpisodes = (offset) => {
+  const updateEpisodes = (offset, name) => {
     setOffset((offset) =>
       offset.map((item) => {
         return item + 12;
       })
     );
-    getAllEpisodes(offset).then(onEpisodeLoaded);
+    if (name) {
+      getAllEpisodes(offset, name).then(onNameEpisode);
+    } else {
+      getAllEpisodes(offset).then(onEpisodeLoaded);
+    }
   };
 
   const onEpisodeLoaded = (newEpisodes) => {
     setEpisodes([...episodes, ...newEpisodes]);
+  };
+
+  const onNameEpisode = (episodeName) => {
+    setEpisodes(episodeName);
   };
 
   const episodesList = () => {
@@ -52,6 +60,9 @@ const EpisodesList = () => {
           type="text"
           className=" search__input search__input_episodes  "
           placeholder="Filter by name..."
+          onChange={(e) => {
+            updateEpisodes(offset, e.target.value);
+          }}
         />
       </div>
       <ul className="list-grid">{episodesList()}</ul>

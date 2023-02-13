@@ -43,7 +43,12 @@ const useService = () => {
     if (gender !== "" && status === "" && species === "" && name === "") {
       return resGender.results.map(_transformCharacter);
     } else {
-      return resOffset.map(_transformCharacter);
+      if (Array.isArray(resOffset)) {
+        return resOffset.map(_transformCharacter);
+      } else if (resOffset["results"] !== undefined) {
+        return resOffset.results;
+      }
+      return resOffset;
     }
   };
 
@@ -56,23 +61,61 @@ const useService = () => {
   };
 
   const getAllLocations = async (
-    offset = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    offset = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    name = "",
+    type = "",
+    dimension = ""
   ) => {
+    if (name !== "" && type === "" && dimension === "") {
+      const locationName = await getResourse(
+        `https://rickandmortyapi.com/api/location/?name=${name}`
+      );
+      return locationName.results;
+    }
+    if (name === "" && type !== "" && dimension === "") {
+      const locationType = await getResourse(
+        `https://rickandmortyapi.com/api/location/?type=${type}`
+      );
+      return locationType.results;
+    }
+    if (name === "" && type === "" && dimension !== "") {
+      const locationDimension = await getResourse(
+        `https://rickandmortyapi.com/api/location/?dimension=${dimension}`
+      );
+      return locationDimension.results;
+    } else {
+      const res = await getResourse(
+        `https://rickandmortyapi.com/api/location/${offset}`
+      );
+
+      return res;
+    }
+  };
+
+  const getSingleLocation = async (id) => {
     const res = await getResourse(
-      `https://rickandmortyapi.com/api/location/${offset}`
+      `https://rickandmortyapi.com/api/location/${id}`
     );
 
     return res;
   };
 
   const getAllEpisodes = async (
-    offset = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    offset = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    name = ""
   ) => {
-    const res = await getResourse(
-      `https://rickandmortyapi.com/api/episode/${offset}`
-    );
+    if (name !== "") {
+      let episodeName = await getResourse(
+        `https://rickandmortyapi.com/api/episode/?name=${name}`
+      );
+      return episodeName.results;
+    } else {
+      const res = await getResourse(
+        `https://rickandmortyapi.com/api/episode/${offset}`
+      );
 
-    return res;
+      return res;
+    }
   };
 
   const getSingleEpisode = async (id) => {
@@ -104,6 +147,7 @@ const useService = () => {
     getAllLocations,
     getAllEpisodes,
     getSingleEpisode,
+    getSingleLocation,
   };
 };
 

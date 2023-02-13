@@ -39,18 +39,7 @@ const SingleChar = () => {
 };
 
 const View = ({ char }) => {
-  const {
-    name,
-    id,
-    gender,
-    episodes,
-    image,
-    location,
-    origin,
-    species,
-    status,
-    type,
-  } = char;
+  const { name, gender, image, location, origin, species, status, type } = char;
 
   return (
     <>

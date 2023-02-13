@@ -21,6 +21,11 @@ const App = () => {
             path="/episodes/:episodeId"
             element={<EpisodeDetails />}
           />
+          <Route
+            exact
+            path="/locations/:locationId"
+            element={<LoctionDetails />}
+          />
           <Route path="*" element={<Page404 />} />
         </Routes>
       </div>
