@@ -3,10 +3,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import rickmorty2 from "../../resourses/img/rickmorty2.png";
 import useService from "../../services/Service";
+import ErrorMessage from "../errorMessage/ErrorMessage";
+import Spinner from "../spinner/Spinner";
 
 const LocationsList = () => {
   const [locations, setLocations] = useState([]);
   const [offset, setOffset] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  const [loading, setLoading] = useState(true);
+  const [errorShow, setErrorShow] = useState(false);
+  const [locationsEnded, setLocationsEnded] = useState(false);
 
   const { getAllLocations } = useService();
 
@@ -20,19 +25,37 @@ const LocationsList = () => {
         return item + 12;
       })
     );
+
+    onLoading();
+
     if (name !== undefined || type !== undefined || dimension !== undefined) {
-      getAllLocations(offset, name, type, dimension).then(onFiltersLoaded);
+      getAllLocations(offset, name, type, dimension)
+        .then(onFiltersLoaded)
+        .catch(onError);
     } else {
-      getAllLocations(offset).then(onLocationLoaded);
+      getAllLocations(offset).then(onLocationLoaded).catch(onError);
     }
   };
 
   const onLocationLoaded = (newLocations) => {
+    let ended = false;
+    if (newLocations.length < 12) {
+      ended = true;
+    }
     setLocations([...locations, ...newLocations]);
+    setLocationsEnded((locationsEnded) => ended);
   };
 
   const onFiltersLoaded = (newLocations) => {
     setLocations(newLocations);
+  };
+
+  const onLoading = () => {
+    setLoading((loading) => false);
+  };
+
+  const onError = () => {
+    setErrorShow(true);
   };
 
   const locationList = () => {
@@ -47,6 +70,10 @@ const LocationsList = () => {
       );
     });
   };
+
+  const spinner = loading ? <Spinner /> : null;
+  const content = !loading && !errorShow ? locationList() : null;
+  const errorImg = errorShow ? <ErrorMessage /> : null;
 
   return (
     <div className="location-list">
@@ -155,12 +182,14 @@ const LocationsList = () => {
         </select>
       </div>
 
-      <ul className="list-grid">{locationList()}</ul>
-
+      <ul className="list-grid">{content}</ul>
+      {spinner}
+      {errorImg}
       <button
         onClick={() => {
           updateLocations(offset);
         }}
+        style={{ display: locationsEnded || errorShow ? "none" : "block" }}
       >
         LOAD MORE
       </button>

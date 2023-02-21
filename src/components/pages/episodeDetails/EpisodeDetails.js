@@ -1,13 +1,16 @@
 import "../../../style/details.scss";
 import arrow from "../../../resourses/icons/arrow.svg";
-import rickphoto from "../../../resourses/img/rickphoto.png";
 import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useService from "../../../services/Service";
+import Spinner from "../../spinner/Spinner";
+import ErrorMessage from "../../errorMessage/ErrorMessage";
 
 const EpisodeDetails = () => {
   const [episode, setEpisode] = useState([]);
   const [characters, setCharacters] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorShow, setErrorShow] = useState(false);
 
   const { episodeId } = useParams();
 
@@ -26,7 +29,8 @@ const EpisodeDetails = () => {
   };
 
   const updateEpisode = (episodeId) => {
-    getSingleEpisode(episodeId).then(onEpisodeLoaded);
+    onLoading();
+    getSingleEpisode(episodeId).then(onEpisodeLoaded).catch(onError);
   };
 
   const onEpisodeLoaded = (episode) => {
@@ -35,10 +39,20 @@ const EpisodeDetails = () => {
 
   const castResult = () => {
     if (episode.characters)
-      getAllCharacters(episode.characters.join("").match(/\d+/g)).then(
-        onCharactersLoaded
-      );
+      getAllCharacters(episode.characters.join("").match(/\d+/g))
+        .then(onCharactersLoaded)
+        .catch(onError);
+    onLoading();
   };
+
+  const onLoading = () => {
+    setLoading(false);
+  };
+
+  const onError = () => {
+    setErrorShow(true);
+  };
+
   const castList = () => {
     if (characters) {
       return characters.map((item) => {
@@ -52,6 +66,10 @@ const EpisodeDetails = () => {
       });
     }
   };
+
+  const spinner = loading ? <Spinner /> : null;
+  const content = !loading && !errorShow ? castList() : null;
+  const errorImg = errorShow ? <ErrorMessage /> : null;
 
   return (
     <div className="details">
@@ -72,7 +90,9 @@ const EpisodeDetails = () => {
       </div>
       <div className="details__title">
         <span>Cast</span>
-        <ul className="details__grid">{castList()}</ul>
+        <ul className="details__grid">{content}</ul>
+        {spinner}
+        {errorImg}
       </div>
     </div>
   );

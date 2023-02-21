@@ -3,10 +3,15 @@ import arrow from "../../../resourses/icons/arrow.svg";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useService from "../../../services/Service";
+import Spinner from "../../spinner/Spinner";
+import ErrorMessage from "../../errorMessage/ErrorMessage";
 
 const LoctionDetails = () => {
   const [location, setLocation] = useState([]);
   const [residents, setResidents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorShow, setErrorShow] = useState(false);
+
   const { locationId } = useParams();
 
   const { getSingleLocation, getAllCharacters } = useService();
@@ -20,16 +25,22 @@ const LoctionDetails = () => {
   }, [location]);
 
   const updateResidents = () => {
-    if (location.residents)
+    if (location.residents) {
+      onLoading();
+
       getAllCharacters(
         location.residents.join("").match(/\d+/g) === null
           ? ""
           : location.residents.join("").match(/\d+/g)
-      ).then(onResidentsLoaded);
+      )
+        .then(onResidentsLoaded)
+        .catch(onError);
+    }
   };
 
   const updateLocation = (locationId) => {
-    getSingleLocation(locationId).then(onLocationLoaded);
+    onLoading();
+    getSingleLocation(locationId).then(onLocationLoaded).catch(onError);
   };
 
   const onResidentsLoaded = (residents) => {
@@ -38,6 +49,14 @@ const LoctionDetails = () => {
 
   const onLocationLoaded = (location) => {
     setLocation(location);
+  };
+
+  const onLoading = () => {
+    setLoading(false);
+  };
+
+  const onError = () => {
+    setErrorShow(true);
   };
 
   const renderResidents = () => {
@@ -62,6 +81,10 @@ const LoctionDetails = () => {
     }
   };
 
+  const spinner = loading ? <Spinner /> : null;
+  const content = !loading && !errorShow ? renderResidents() : null;
+  const errorImg = errorShow ? <ErrorMessage /> : null;
+
   return (
     <div className="details">
       <Link to="/locations" className="button__return">
@@ -81,10 +104,9 @@ const LoctionDetails = () => {
       </div>
       <div className="details__title">
         <span>Residents</span>
-        <ul className="details__grid">
-          {/* {residents.length > 0 ? renderResidents() : "No residents found"} */}
-          {renderResidents()}
-        </ul>
+        <ul className="details__grid">{content}</ul>
+        {spinner}
+        {errorImg}
       </div>
     </div>
   );

@@ -4,10 +4,12 @@ import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useService from "../../../services/Service";
 import Spinner from "../../spinner/Spinner";
+import ErrorMessage from "../../errorMessage/ErrorMessage";
 const SingleChar = () => {
   const { charId } = useParams();
   const [char, setChar] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [errorShow, setErrorShow] = useState(false);
 
   const { getCharacter } = useService();
 
@@ -18,7 +20,7 @@ const SingleChar = () => {
   const updateChar = () => {
     if (charId) {
       onLoading();
-      getCharacter(charId).then(onCharLoaded);
+      getCharacter(charId).then(onCharLoaded).catch(onError);
     }
     return null;
   };
@@ -31,9 +33,19 @@ const SingleChar = () => {
     setLoading(false);
   };
 
+  const onError = () => {
+    setErrorShow(true);
+  };
+
+  const spinner = loading ? <Spinner /> : null;
+  const content = !loading && !errorShow ? <View char={char} /> : null;
+  const errorImg = errorShow ? <ErrorMessage /> : null;
+
   return (
     <div className="single-char">
-      {loading ? <Spinner /> : <View char={char} />}
+      {content}
+      {spinner}
+      {errorImg}
     </div>
   );
 };

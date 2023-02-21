@@ -11,6 +11,7 @@ const CharList = () => {
   const [offset, setOffset] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
   const [loading, setLoading] = useState(true);
   const [errorShow, setErrorShow] = useState(false);
+  const [charEnded, setCharEnded] = useState(false);
 
   const { getAllCharacters } = useService();
 
@@ -24,6 +25,7 @@ const CharList = () => {
         return item + 8;
       })
     );
+
     onLoading();
 
     if (
@@ -47,7 +49,13 @@ const CharList = () => {
   };
 
   const onCharsLoaded = (newChars) => {
+    let ended = false;
+    if (newChars.length < 7) {
+      ended = true;
+    }
+
     setChars([...chars, ...newChars]);
+    setCharEnded((charEnded) => ended);
   };
 
   const onLoading = () => {
@@ -59,7 +67,7 @@ const CharList = () => {
   };
 
   const renderList = () => {
-    return chars.map((item, id) => {
+    return chars.map((item) => {
       return (
         <Link to={`/character/${item.id}`} key={item.id}>
           <li className="char__sample char__sample_active" tabIndex={0}>
@@ -166,8 +174,14 @@ const CharList = () => {
       <ul className="char__grid">{content}</ul>
       {spinner}
       {errorImg}
-      <button onClick={() => updateChars(offset)}>LOAD MORE</button>
+      <button
+        onClick={() => updateChars(offset)}
+        style={{ display: charEnded || errorShow ? "none" : "block" }}
+      >
+        LOAD MORE
+      </button>
     </div>
   );
 };
+
 export default CharList;
