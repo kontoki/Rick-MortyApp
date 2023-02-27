@@ -10,11 +10,10 @@ import "./episodesList.scss";
 const EpisodesList = () => {
   const [episodes, setEpisodes] = useState([]);
   const [offset, setOffset] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  const [loading, setLoading] = useState(true);
-  const [errorShow, setErrorShow] = useState(false);
+
   const [episodeEnded, setepisodeEnded] = useState(false);
 
-  const { getAllEpisodes } = useService();
+  const { getAllEpisodes, loading, error } = useService();
 
   useEffect(() => {
     updateEpisodes();
@@ -27,12 +26,10 @@ const EpisodesList = () => {
       })
     );
 
-    onLoading();
-
     if (name) {
-      getAllEpisodes(offset, name).then(onNameEpisode).catch(onError);
+      getAllEpisodes(offset, name).then(onNameEpisode);
     } else {
-      getAllEpisodes(offset).then(onEpisodeLoaded).catch(onError);
+      getAllEpisodes(offset).then(onEpisodeLoaded);
     }
   };
 
@@ -47,14 +44,6 @@ const EpisodesList = () => {
 
   const onNameEpisode = (episodeName) => {
     setEpisodes(episodeName);
-  };
-
-  const onLoading = () => {
-    setLoading((loading) => false);
-  };
-
-  const onError = () => {
-    setErrorShow(true);
   };
 
   const episodesList = () => {
@@ -72,8 +61,8 @@ const EpisodesList = () => {
   };
 
   const spinner = loading ? <Spinner /> : null;
-  const content = !loading && !errorShow ? episodesList() : null;
-  const errorImg = errorShow ? <ErrorMessage /> : null;
+  const content = !loading && !error ? episodesList() : null;
+  const errorImg = error ? <ErrorMessage /> : null;
 
   return (
     <div className="episode-list">
@@ -99,7 +88,7 @@ const EpisodesList = () => {
       {spinner}
       {errorImg}
       <button
-        style={{ display: episodeEnded || errorShow ? "none" : "block" }}
+        style={{ display: episodeEnded || error ? "none" : "block" }}
         onClick={() => {
           updateEpisodes(offset);
         }}

@@ -9,12 +9,10 @@ import ErrorMessage from "../../errorMessage/ErrorMessage";
 const LoctionDetails = () => {
   const [location, setLocation] = useState([]);
   const [residents, setResidents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorShow, setErrorShow] = useState(false);
 
   const { locationId } = useParams();
 
-  const { getSingleLocation, getAllCharacters } = useService();
+  const { getSingleLocation, getAllCharacters, loading, error } = useService();
 
   useEffect(() => {
     updateLocation(locationId);
@@ -26,21 +24,16 @@ const LoctionDetails = () => {
 
   const updateResidents = () => {
     if (location.residents) {
-      onLoading();
-
       getAllCharacters(
         location.residents.join("").match(/\d+/g) === null
           ? ""
           : location.residents.join("").match(/\d+/g)
-      )
-        .then(onResidentsLoaded)
-        .catch(onError);
+      ).then(onResidentsLoaded);
     }
   };
 
   const updateLocation = (locationId) => {
-    onLoading();
-    getSingleLocation(locationId).then(onLocationLoaded).catch(onError);
+    getSingleLocation(locationId).then(onLocationLoaded);
   };
 
   const onResidentsLoaded = (residents) => {
@@ -49,14 +42,6 @@ const LoctionDetails = () => {
 
   const onLocationLoaded = (location) => {
     setLocation(location);
-  };
-
-  const onLoading = () => {
-    setLoading(false);
-  };
-
-  const onError = () => {
-    setErrorShow(true);
   };
 
   const renderResidents = () => {
@@ -82,8 +67,8 @@ const LoctionDetails = () => {
   };
 
   const spinner = loading ? <Spinner /> : null;
-  const content = !loading && !errorShow ? renderResidents() : null;
-  const errorImg = errorShow ? <ErrorMessage /> : null;
+  const content = !loading && !error ? renderResidents() : null;
+  const errorImg = error ? <ErrorMessage /> : null;
 
   return (
     <div className="details">

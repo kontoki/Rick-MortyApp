@@ -9,12 +9,10 @@ import ErrorMessage from "../../errorMessage/ErrorMessage";
 const EpisodeDetails = () => {
   const [episode, setEpisode] = useState([]);
   const [characters, setCharacters] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [errorShow, setErrorShow] = useState(false);
 
   const { episodeId } = useParams();
 
-  const { getSingleEpisode, getAllCharacters } = useService();
+  const { getSingleEpisode, getAllCharacters, loading, error } = useService();
 
   useEffect(() => {
     updateEpisode(episodeId);
@@ -29,8 +27,7 @@ const EpisodeDetails = () => {
   };
 
   const updateEpisode = (episodeId) => {
-    onLoading();
-    getSingleEpisode(episodeId).then(onEpisodeLoaded).catch(onError);
+    getSingleEpisode(episodeId).then(onEpisodeLoaded);
   };
 
   const onEpisodeLoaded = (episode) => {
@@ -39,18 +36,9 @@ const EpisodeDetails = () => {
 
   const castResult = () => {
     if (episode.characters)
-      getAllCharacters(episode.characters.join("").match(/\d+/g))
-        .then(onCharactersLoaded)
-        .catch(onError);
-    onLoading();
-  };
-
-  const onLoading = () => {
-    setLoading(false);
-  };
-
-  const onError = () => {
-    setErrorShow(true);
+      getAllCharacters(episode.characters.join("").match(/\d+/g)).then(
+        onCharactersLoaded
+      );
   };
 
   const castList = () => {
@@ -68,8 +56,8 @@ const EpisodeDetails = () => {
   };
 
   const spinner = loading ? <Spinner /> : null;
-  const content = !loading && !errorShow ? castList() : null;
-  const errorImg = errorShow ? <ErrorMessage /> : null;
+  const content = !loading && !error ? castList() : null;
+  const errorImg = error ? <ErrorMessage /> : null;
 
   return (
     <div className="details">

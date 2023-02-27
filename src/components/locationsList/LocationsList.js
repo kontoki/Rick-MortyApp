@@ -9,11 +9,9 @@ import Spinner from "../spinner/Spinner";
 const LocationsList = () => {
   const [locations, setLocations] = useState([]);
   const [offset, setOffset] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  const [loading, setLoading] = useState(true);
-  const [errorShow, setErrorShow] = useState(false);
   const [locationsEnded, setLocationsEnded] = useState(false);
 
-  const { getAllLocations } = useService();
+  const { getAllLocations, loading, error } = useService();
 
   useEffect(() => {
     updateLocations();
@@ -26,14 +24,10 @@ const LocationsList = () => {
       })
     );
 
-    onLoading();
-
     if (name !== undefined || type !== undefined || dimension !== undefined) {
-      getAllLocations(offset, name, type, dimension)
-        .then(onFiltersLoaded)
-        .catch(onError);
+      getAllLocations(offset, name, type, dimension).then(onFiltersLoaded);
     } else {
-      getAllLocations(offset).then(onLocationLoaded).catch(onError);
+      getAllLocations(offset).then(onLocationLoaded);
     }
   };
 
@@ -50,14 +44,6 @@ const LocationsList = () => {
     setLocations(newLocations);
   };
 
-  const onLoading = () => {
-    setLoading((loading) => false);
-  };
-
-  const onError = () => {
-    setErrorShow(true);
-  };
-
   const locationList = () => {
     return locations.map((item) => {
       return (
@@ -72,8 +58,8 @@ const LocationsList = () => {
   };
 
   const spinner = loading ? <Spinner /> : null;
-  const content = !loading && !errorShow ? locationList() : null;
-  const errorImg = errorShow ? <ErrorMessage /> : null;
+  const content = !loading && !error ? locationList() : null;
+  const errorImg = ErrorEvent ? <ErrorMessage /> : null;
 
   return (
     <div className="location-list">
@@ -189,7 +175,7 @@ const LocationsList = () => {
         onClick={() => {
           updateLocations(offset);
         }}
-        style={{ display: locationsEnded || errorShow ? "none" : "block" }}
+        style={{ display: locationsEnded || error ? "none" : "block" }}
       >
         LOAD MORE
       </button>

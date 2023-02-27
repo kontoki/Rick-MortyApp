@@ -8,10 +8,8 @@ import ErrorMessage from "../../errorMessage/ErrorMessage";
 const SingleChar = () => {
   const { charId } = useParams();
   const [char, setChar] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorShow, setErrorShow] = useState(false);
 
-  const { getCharacter } = useService();
+  const { getCharacter, loading, error } = useService();
 
   useEffect(() => {
     updateChar();
@@ -19,8 +17,7 @@ const SingleChar = () => {
 
   const updateChar = () => {
     if (charId) {
-      onLoading();
-      getCharacter(charId).then(onCharLoaded).catch(onError);
+      getCharacter(charId).then(onCharLoaded);
     }
     return null;
   };
@@ -29,17 +26,9 @@ const SingleChar = () => {
     setChar(char);
   };
 
-  const onLoading = () => {
-    setLoading(false);
-  };
-
-  const onError = () => {
-    setErrorShow(true);
-  };
-
   const spinner = loading ? <Spinner /> : null;
-  const content = !loading && !errorShow ? <View char={char} /> : null;
-  const errorImg = errorShow ? <ErrorMessage /> : null;
+  const content = !loading && !error ? <View char={char} /> : null;
+  const errorImg = error ? <ErrorMessage /> : null;
 
   return (
     <div className="single-char">

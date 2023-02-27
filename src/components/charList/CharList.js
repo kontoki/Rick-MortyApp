@@ -9,11 +9,10 @@ import { Link } from "react-router-dom";
 const CharList = () => {
   const [chars, setChars] = useState([]);
   const [offset, setOffset] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
-  const [loading, setLoading] = useState(true);
-  const [errorShow, setErrorShow] = useState(false);
+
   const [charEnded, setCharEnded] = useState(false);
 
-  const { getAllCharacters } = useService();
+  const { getAllCharacters, loading, error } = useService();
 
   useEffect(() => {
     updateChars(offset);
@@ -26,21 +25,19 @@ const CharList = () => {
       })
     );
 
-    onLoading();
-
     if (
       gender !== undefined ||
       status !== undefined ||
       species !== undefined ||
       name !== undefined
     ) {
-      getAllCharacters(offset, status, gender, species, name)
-        .then(onStatusLoaded)
-        .catch(onError);
+      getAllCharacters(offset, status, gender, species, name).then(
+        onStatusLoaded
+      );
     } else {
-      getAllCharacters(offset, status, gender, species, name)
-        .then(onCharsLoaded)
-        .catch(onError);
+      getAllCharacters(offset, status, gender, species, name).then(
+        onCharsLoaded
+      );
     }
   };
 
@@ -58,14 +55,6 @@ const CharList = () => {
     setCharEnded((charEnded) => ended);
   };
 
-  const onLoading = () => {
-    setLoading((loading) => false);
-  };
-
-  const onError = () => {
-    setErrorShow(true);
-  };
-
   const renderList = () => {
     return chars.map((item) => {
       return (
@@ -81,8 +70,8 @@ const CharList = () => {
   };
 
   const spinner = loading ? <Spinner /> : null;
-  const content = !loading && !errorShow ? renderList() : null;
-  const errorImg = errorShow ? <ErrorMessage /> : null;
+  const content = !loading && !error ? renderList() : null;
+  const errorImg = error ? <ErrorMessage /> : null;
 
   return (
     <div className="char-list">
@@ -176,7 +165,7 @@ const CharList = () => {
       {errorImg}
       <button
         onClick={() => updateChars(offset)}
-        style={{ display: charEnded || errorShow ? "none" : "block" }}
+        style={{ display: charEnded || error ? "none" : "block" }}
       >
         LOAD MORE
       </button>

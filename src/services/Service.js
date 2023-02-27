@@ -1,12 +1,7 @@
-const useService = () => {
-  const getResourse = async (url) => {
-    const res = await fetch(url);
+import { useHttp } from "../hooks/http.hook";
 
-    if (!res.ok) {
-      throw new Error(`Could not fetch ${url}, status ${res.status}`);
-    }
-    return await res.json();
-  };
+const useService = () => {
+  const { loading, error, request } = useHttp();
 
   const getAllCharacters = async (
     offset = [1, 2, 3, 4, 5, 6, 7, 8],
@@ -15,19 +10,19 @@ const useService = () => {
     species = "",
     name = ""
   ) => {
-    const resOffset = await getResourse(
+    const resOffset = await request(
       `https://rickandmortyapi.com/api/character/${offset}`
     );
-    const resName = await getResourse(
+    const resName = await request(
       `https://rickandmortyapi.com/api/character/?name=${name}`
     );
-    const resStatus = await getResourse(
+    const resStatus = await request(
       `https://rickandmortyapi.com/api/character/?status=${status}`
     );
-    const resGender = await getResourse(
+    const resGender = await request(
       `https://rickandmortyapi.com/api/character/?gender=${gender}`
     );
-    const resSpecies = await getResourse(
+    const resSpecies = await request(
       `https://rickandmortyapi.com/api/character/?species=${species}`
     );
 
@@ -53,7 +48,7 @@ const useService = () => {
   };
 
   const getCharacter = async (id) => {
-    const res = await getResourse(
+    const res = await request(
       `https://rickandmortyapi.com/api/character/${id}`
     );
 
@@ -67,24 +62,24 @@ const useService = () => {
     dimension = ""
   ) => {
     if (name !== "" && type === "" && dimension === "") {
-      const locationName = await getResourse(
+      const locationName = await request(
         `https://rickandmortyapi.com/api/location/?name=${name}`
       );
       return locationName.results;
     }
     if (name === "" && type !== "" && dimension === "") {
-      const locationType = await getResourse(
+      const locationType = await request(
         `https://rickandmortyapi.com/api/location/?type=${type}`
       );
       return locationType.results;
     }
     if (name === "" && type === "" && dimension !== "") {
-      const locationDimension = await getResourse(
+      const locationDimension = await request(
         `https://rickandmortyapi.com/api/location/?dimension=${dimension}`
       );
       return locationDimension.results;
     } else {
-      const res = await getResourse(
+      const res = await request(
         `https://rickandmortyapi.com/api/location/${offset}`
       );
 
@@ -93,9 +88,7 @@ const useService = () => {
   };
 
   const getSingleLocation = async (id) => {
-    const res = await getResourse(
-      `https://rickandmortyapi.com/api/location/${id}`
-    );
+    const res = await request(`https://rickandmortyapi.com/api/location/${id}`);
 
     return res;
   };
@@ -105,12 +98,12 @@ const useService = () => {
     name = ""
   ) => {
     if (name !== "") {
-      let episodeName = await getResourse(
+      let episodeName = await request(
         `https://rickandmortyapi.com/api/episode/?name=${name}`
       );
       return episodeName.results;
     } else {
-      const res = await getResourse(
+      const res = await request(
         `https://rickandmortyapi.com/api/episode/${offset}`
       );
 
@@ -119,9 +112,7 @@ const useService = () => {
   };
 
   const getSingleEpisode = async (id) => {
-    const res = await getResourse(
-      `https://rickandmortyapi.com/api/episode/${id}`
-    );
+    const res = await request(`https://rickandmortyapi.com/api/episode/${id}`);
 
     return res;
   };
@@ -148,6 +139,8 @@ const useService = () => {
     getAllEpisodes,
     getSingleEpisode,
     getSingleLocation,
+    loading,
+    error,
   };
 };
 
